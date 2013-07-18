@@ -915,10 +915,7 @@ add_gem 'compass-rails', :group => :assets if prefer :frontend, 'foundation'
 add_gem 'zurb-foundation', :group => :assets if prefer :frontend, 'foundation'
 if prefer :bootstrap, 'less'
   add_gem 'less-rails', :group => :assets
-  add_gem 'twitter-bootstrap-rails', :group => :assets
-  # install gem 'therubyracer' to use Less
-  add_gem 'libv8'
-  add_gem 'therubyracer', :group => :assets, :platform => :ruby, :require => 'v8'
+  add_gem 'twitter-bootstrap-rails', :github => 'seyhunak/twitter-bootstrap-rails', :group => :assets
 end
 
 ## Email
@@ -2563,13 +2560,17 @@ end
 ## JSRUNTIME
 case RbConfig::CONFIG['host_os']
   when /linux/i
-    prefs[:jsruntime] = yes_wizard? "Add 'therubyracer' JavaScript runtime (for Linux users without node.js)?" unless prefs.has_key? :jsruntime
+    prefs[:jsruntime] = yes_wizard? "Add #{(RUBY_PLATFORM == 'java') ? 'therubyrhino' : 'therubyracer'} JavaScript runtime (for Linux users without node.js)?" unless prefs.has_key? :jsruntime
     if prefs[:jsruntime]
       # was it already added for bootstrap-less?
       unless prefer :bootstrap, 'less'
         say_wizard "recipe adding 'therubyracer' JavaScript runtime gem"
-        add_gem 'libv8'
-        add_gem 'therubyracer', :group => :assets, :platform => :ruby, :require => 'v8'
+        if (RUBY_PLATFORM == 'java')
+          add_gem 'therubyrhino'
+        else
+          add_gem 'libv8'
+          add_gem 'therubyracer', :group => :assets, :platform => :ruby, :require => 'v8'
+        end        
       end
     end
 end
